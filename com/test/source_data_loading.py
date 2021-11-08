@@ -39,16 +39,9 @@ if __name__ == '__main__':
                 .parquet(staging_dir)
 
         if src == 'OL':
-            ol_txn_df = spark.read\
-                .format("com.springml.spark.sftp")\
-                .option("host", app_secret["sftp_conf"]["hostname"])\
-                .option("port", app_secret["sftp_conf"]["port"])\
-                .option("username", app_secret["sftp_conf"]["username"])\
-                .option("pem", os.path.abspath(current_dir + "/../../" + app_secret["sftp_conf"]["pem"]))\
-                .option("fileType", "csv")\
-                .option("delimiter", "|")\
-                .load(src_conf["sftp_conf"]["directory"] + "/" + src_conf["sftp_conf"]["filename"])\
-                .withColumn("ins_dt", current_date())
+            ol_txn_df = ut.rread_from_sftp(app_secret, src_conf["sftp_conf"]["directory"], src_conf["sftp_conf"]["filename"], spark )
+            ol_txn_df = ol_txn_df.withColumn("ins_dt", current_date())
+            txn_df.show()
 
             ol_txn_df.write\
                 .partitionBy("ins_dt")\
