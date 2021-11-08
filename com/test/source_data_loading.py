@@ -49,9 +49,9 @@ if __name__ == '__main__':
 
             txnDF.show()
 
-            txnDF.write()
-                .partitionBy("ins_dt")\
-                .mode("append")\
+            txnDF.write() \
+                .partitionBy("ins_dt") \
+                .mode("append") \
                 .parquet(staging_dir)
 
         if src == 'OL':
@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 .load(src_conf["sftp_conf"]["directory"] + "/receipts_delta_GBR_14_10_2017.csv")\
                 .withColumn("ins_dt", current_date())
 
-            ol_txn_df.write()
+            ol_txn_df.write()\
                 .partitionBy("ins_dt")\
                 .mode("append")\
                 .parquet(staging_dir)
@@ -77,10 +77,10 @@ if __name__ == '__main__':
                 .format("com.mongodb.spark.sql.DefaultSource")\
                 .option("database", src_conf["mongodb_config"]["database"])\
                 .option("collection", src_conf["mongodb_config"]["address"])\
-                .load()
+                .load()\
                 .withColumn("ins_dt", current_date())
 
-            students.write()
+            students.write()\
                 .partitionBy("ins_dt")\
                 .mode("append")\
                 .parquet(staging_dir)
@@ -89,7 +89,7 @@ if __name__ == '__main__':
                 .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/finances.csv") \
                 .withColumn("ins_dt", current_date())
 
-            finance_df.write()
+            finance_df.write()\
                 .partitionBy("ins_dt")\
                 .mode("append")\
                 .parquet(staging_dir)
