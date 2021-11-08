@@ -28,7 +28,7 @@ if __name__ == '__main__':
         src_conf = app_conf[src]
         staging_dir = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src
         if src == 'SB':
-            txn_df = ut.get_mysql_jdbc_url(app_secret, src_conf["mysql_conf"]["dbtable"], src_conf["mysql_conf"]["partition_column"], spark)
+            txn_df = ut.read_from_mysql(app_secret, src_conf["mysql_conf"]["dbtable"], src_conf["mysql_conf"]["partition_column"], spark)
 
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show()
