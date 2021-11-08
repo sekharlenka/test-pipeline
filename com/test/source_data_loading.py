@@ -28,28 +28,15 @@ if __name__ == '__main__':
         src_conf = app_conf[src]
         staging_dir = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src
         if src == 'SB':
-            jdbc_params = {"url": ut.get_mysql_jdbc_url(app_secret),
-                          "lowerBound": "1",
-                          "upperBound": "100",
-                          "dbtable": src_conf["mysql_conf"]["dbtable"],
-                          "numPartitions": "2",
-                          "partitionColumn": src_conf["mysql_conf"]["partition_column"],
-                          "user": app_secret["mysql_conf"]["username"],
-                          "password": app_secret["mysql_conf"]["password"]
-                           }
+            txn_df = ut.get_mysql_jdbc_url(app_secret,
+                                           src_conf["mysql_conf"]["dbtable"],
+                                           src_conf["mysql_conf"]["partition_column"],
+                                           spark)
 
-            # use the ** operator/un-packer to treat a python dictionary as **kwargs
-            print("\nReading data from MySQL DB using SparkSession.read.format(),")
-            txnDF = spark\
-                .read.format("jdbc")\
-                .option("driver", "com.mysql.cj.jdbc.Driver")\
-                .options(**jdbc_params)\
-                .load() \
-                .withColumn("ins_dt", current_date())
+            txn_df = txn_df.withColumn("ins_dt", current_date())
+            txn_df.show()
 
-            txnDF.show()
-
-            txnDF.write \
+            txn_df.write \
                 .partitionBy("ins_dt") \
                 .mode("append") \
                 .parquet(staging_dir)
