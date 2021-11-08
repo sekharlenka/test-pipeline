@@ -6,15 +6,10 @@ import utils.aws_utils as ut
 
 if __name__ == '__main__':
 
-    os.environ["PYSPARK_SUBMIT_ARGS"] = (
-        '--packages "mysql:mysql-connector-java:8.0.15" pyspark-shell'
-    )
-
     # Create the SparkSession
     spark = SparkSession \
         .builder \
         .appName("Read ingestion enterprise applications") \
-        .master('local[*]') \
         .getOrCreate()
     spark.sparkContext.setLogLevel('ERROR')
 
@@ -31,6 +26,7 @@ if __name__ == '__main__':
 
     for src in source_list:
         src_conf = app_conf[src]
+        staging_dir = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src
         if src == 'SB':
             jdbc_params = {"url": ut.get_mysql_jdbc_url(app_secret),
                           "lowerBound": "1",
@@ -56,7 +52,7 @@ if __name__ == '__main__':
             txnDF.write()
                 .partitionBy("ins_dt")\
                 .mode("append")\
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + src)
+                .parquet(staging_dir)
 
         if src == 'OL':
             ol_txn_df = spark.read\
@@ -73,7 +69,7 @@ if __name__ == '__main__':
             ol_txn_df.write()
                 .partitionBy("ins_dt")\
                 .mode("append")\
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + src)
+                .parquet(staging_dir)
 
         if src == 'ADDR':
             students = spark\
@@ -87,7 +83,7 @@ if __name__ == '__main__':
             students.write()
                 .partitionBy("ins_dt")\
                 .mode("append")\
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + src)
+                .parquet(staging_dir)
         if src == 'CP':
             finance_df = spark.read \
                 .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/finances.csv") \
@@ -96,6 +92,6 @@ if __name__ == '__main__':
             finance_df.write()
                 .partitionBy("ins_dt")\
                 .mode("append")\
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + src)
+                .parquet(staging_dir)
 
-    # spark-submit --packages "mysql:mysql-connector-java:8.0.15" dataframe/ingestion/others/systems/mysql_df.py
+# spark-submit --packages "mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/test/source_data_loading.py
