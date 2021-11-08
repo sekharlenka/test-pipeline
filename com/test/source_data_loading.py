@@ -60,10 +60,10 @@ if __name__ == '__main__':
                 .option("host", app_secret["sftp_conf"]["hostname"])\
                 .option("port", app_secret["sftp_conf"]["port"])\
                 .option("username", app_secret["sftp_conf"]["username"])\
-                .option("pem", os.path.abspath(current_dir + "/../../../../" + app_secret["sftp_conf"]["pem"]))\
+                .option("pem", os.path.abspath(current_dir + "/../../" + app_secret["sftp_conf"]["pem"]))\
                 .option("fileType", "csv")\
                 .option("delimiter", "|")\
-                .load(src_conf["sftp_conf"]["directory"] + "/receipts_delta_GBR_14_10_2017.csv")\
+                .load(src_conf["sftp_conf"]["directory"] + "/" + src_conf["sftp_conf"]["filename"])\
                 .withColumn("ins_dt", current_date())
 
             ol_txn_df.write()\

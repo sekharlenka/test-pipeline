@@ -1,5 +1,5 @@
 source_list:
-  - SB
+  - OL
 
 staging_dir: staging
 
@@ -14,6 +14,7 @@ OL:
       filetype: csv
       delimiter: |
       directory: /home/ubuntu/data
+      filename: receipts_delta_GBR_14_10_2017.csv
 
 ADDR:
   mongodb_config:
