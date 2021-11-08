@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
             txnDF.show()
 
-            txnDF.write() \
+            txnDF.write \
                 .partitionBy("ins_dt") \
                 .mode("append") \
                 .parquet(staging_dir)
