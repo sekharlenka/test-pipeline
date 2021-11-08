@@ -46,3 +46,4 @@ def read_from_sftp(app_secret, directory , filename , pemfile, spark):
                 .option("fileType", "csv")\
                 .option("delimiter", "|")\
                 .load(directory  + "/" + filename)
+    return ol_txn_df
