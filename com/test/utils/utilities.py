@@ -35,7 +35,7 @@ def read_from_mysql(app_secret, table, partition_col, spark):
     return txn_df
 
 
-def read_from_sftp(app_secret, directory , filename , spark)
+def read_from_sftp(app_secret, directory , filename , spark):
     print("\nReading data from sftp using com.springml.spark.sftp")
     ol_txn_df = spark.read\
                 .format("com.springml.spark.sftp")\
