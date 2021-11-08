@@ -39,7 +39,7 @@ if __name__ == '__main__':
                 .parquet(staging_dir)
 
         if src == 'OL':
-            ol_txn_df = ut.rread_from_sftp(app_secret, src_conf["sftp_conf"]["directory"], src_conf["sftp_conf"]["filename"], spark )
+            ol_txn_df = ut.read_from_sftp(app_secret, src_conf["sftp_conf"]["directory"], src_conf["sftp_conf"]["filename"], os.path.abspath(current_dir + "/../../../" + app_secret["sftp_conf"]["pem"]), spark )
             ol_txn_df = ol_txn_df.withColumn("ins_dt", current_date())
             txn_df.show()
 

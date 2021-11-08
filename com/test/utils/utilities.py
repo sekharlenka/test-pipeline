@@ -35,14 +35,14 @@ def read_from_mysql(app_secret, table, partition_col, spark):
     return txn_df
 
 
-def read_from_sftp(app_secret, directory , filename , spark):
+def read_from_sftp(app_secret, directory , filename , pemfile, spark):
     print("\nReading data from sftp using com.springml.spark.sftp")
     ol_txn_df = spark.read\
                 .format("com.springml.spark.sftp")\
                 .option("host", app_secret["sftp_conf"]["hostname"])\
                 .option("port", app_secret["sftp_conf"]["port"])\
                 .option("username", app_secret["sftp_conf"]["username"])\
-                .option("pem", os.path.abspath(current_dir + "/../../" + app_secret["sftp_conf"]["pem"]))\
+                .option("pem", pemfile)\
                 .option("fileType", "csv")\
                 .option("delimiter", "|")\
                 .load(directory  + "/" + filename)
