@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 .load(src_conf["sftp_conf"]["directory"] + "/" + src_conf["sftp_conf"]["filename"])\
                 .withColumn("ins_dt", current_date())
 
-            ol_txn_df.write()\
+            ol_txn_df.write\
                 .partitionBy("ins_dt")\
                 .mode("append")\
                 .parquet(staging_dir)
