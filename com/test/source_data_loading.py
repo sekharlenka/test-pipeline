@@ -44,7 +44,7 @@ if __name__ == '__main__':
                 .read.format("jdbc")\
                 .option("driver", "com.mysql.cj.jdbc.Driver")\
                 .options(**jdbc_params)\
-                .load()
+                .load() \
                 .withColumn("ins_dt", current_date())
 
             txnDF.show()
