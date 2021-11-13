@@ -65,7 +65,7 @@ if __name__ == '__main__':
                 .mode("append")\
                 .parquet(staging_dir)
             print("\nReading data from MongoDB using com.mongodb")
-            students.count()
+            students.show(5)
         if src == 'CP':
             finance_df = spark.read \
                 .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/finances.csv") \
