@@ -4,6 +4,9 @@ source_list:
   - CP
   - ADDR
 
+target_list:
+  - REGIS_DIM
+
 staging_dir: staging
 
 SB:
@@ -30,6 +33,23 @@ CP:
     s3_bucket: raj-4321
     filename: KC_Extract_1_20171009.csv
 
+REGIS_DIM:
+  tableName: DATAMART.REGIS_DIM
+  source_data: CP
+  loadingQuery: >
+    SELECT
+      MONOTONICALLY_INCREASING_ID() AS REGIS_KEY, REGIS_CNSM_ID AS CNSM_ID,REGIS_CTY_CODE AS CTY_CODE,
+      REGIS_ID, REGIS_DATE, REGIS_LTY_ID AS LTY_ID, REGIS_CHANNEL, REGIS_GENDER, REGIS_CITY, INS_DT
+    FROM
+      (SELECT
+        DISTINCT REGIS_CNSM_ID, CAST(REGIS_CTY_CODE AS SMALLINT), CAST(REGIS_ID AS INTEGER),
+        REGIS_LTY_ID, REGIS_DATE, REGIS_CHANNEL, REGIS_GENDER, REGIS_CITY, INS_DT
+      FROM
+        CP
+      WHERE
+        INS_DT = CURRENT_DATE
+      ) CP
+
 s3_conf:
   s3_bucket: raj-4321
 
@@ -41,26 +61,5 @@ redshift_conf:
   dbtable: PUBLIC.TXN_FCT
   query: SELECT txn_id, create_time, amount, cust_id from PUBLIC.TXN_FCT
 
-spark_sql_demo:
-  agg_demo: >
-    select
-        AccountNumber,
-        UniqueTransactionDescriptions,
-        sort_array(UniqueTransactionDescriptions, false) as OrderedUniqueTransactionDescriptions,
-        size(UniqueTransactionDescriptions) as CountOfUniqueTransactionTypes,
-        array_contains(UniqueTransactionDescriptions, 'Movies') as WentToMovies
-    from
-        agg_finances
 
 
-  case_when_demo: >
-    select
-        company,
-        employee.firstName as firstName,
-        case
-            when company = 'FamilyCo' then 'Premium'
-            when company = 'OldCo' then 'Legacy'
-            else 'Standard'
-        end as Tier
-    from
-        employees
