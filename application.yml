@@ -1,4 +1,7 @@
 source_list:
+  - SB
+  - OL
+  - CP
   - ADDR
 
 staging_dir: staging
@@ -20,6 +23,7 @@ ADDR:
   mongodb_config:
     database: customer
     collection: address
+    app_package: spark.mongodb.input.uri
 
 CP:
   s3_conf:
