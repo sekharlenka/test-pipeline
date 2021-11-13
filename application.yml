@@ -1,5 +1,5 @@
 source_list:
-  - OL
+  - CP
 
 staging_dir: staging
 
@@ -18,12 +18,13 @@ OL:
 
 ADDR:
   mongodb_config:
-    database: school
-    collection: students
+    database: customer
+    collection: address
 
 CP:
   s3_conf:
     s3_bucket: raj-4321
+    filename: KC_Extract_1_20171009.csv
 
 s3_conf:
   s3_bucket: raj-4321
