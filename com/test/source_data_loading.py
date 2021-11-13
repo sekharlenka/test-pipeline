@@ -6,13 +6,7 @@ import utils.utilities as ut
 
 if __name__ == '__main__':
 
-    # Create the SparkSession
-    spark = SparkSession \
-        .builder \
-        .appName("Read ingestion enterprise applications") \
-        .config("spark.mongodb.input.uri", app_secret["mongodb_config"]["uri"])\
-        .getOrCreate()
-    spark.sparkContext.setLogLevel('ERROR')
+
 
     current_dir = os.path.abspath(os.path.dirname(__file__))
     app_config_path = os.path.abspath(current_dir + "/../../" + "application.yml")
@@ -24,6 +18,13 @@ if __name__ == '__main__':
     app_secret = yaml.load(secret, Loader=yaml.FullLoader)
 
     source_list = app_conf['source_list']
+    # Create the SparkSession
+    spark = SparkSession \
+        .builder \
+        .appName("Read ingestion enterprise applications") \
+        .config("spark.mongodb.input.uri", app_secret["mongodb_config"]["uri"])\
+        .getOrCreate()
+    spark.sparkContext.setLogLevel('ERROR')
 
     for src in source_list:
         src_conf = app_conf[src]
