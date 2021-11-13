@@ -27,7 +27,7 @@ if __name__ == '__main__':
     target_list = app_conf['target_list']
     for tgt in target_list:
 
-        src_conf = app_conf[tgt][source_data]
+        src_conf = app_conf[tgt]["source_data"]
 
         if tgt == 'REGIS_DIM':
             print("\nReading data from S3 Bucket using org.apache.hadoop:hadoop-aws:2.7.4")
