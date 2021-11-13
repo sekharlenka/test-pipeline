@@ -53,9 +53,11 @@ if __name__ == '__main__':
                 .read\
                 .format("com.mongodb.spark.sql.DefaultSource")\
                 .option("database", src_conf["mongodb_config"]["database"])\
-                .option("collection", src_conf["mongodb_config"]["address"])\
+                .option("collection", src_conf["mongodb_config"]["collection"])\
                 .load()\
                 .withColumn("ins_dt", current_date())
+
+            students.count()
 
             students.write\
                 .partitionBy("ins_dt")\
