@@ -57,7 +57,7 @@ if __name__ == '__main__':
                 .load()\
                 .withColumn("ins_dt", current_date())
 
-            students.write()\
+            students.write\
                 .partitionBy("ins_dt")\
                 .mode("append")\
                 .parquet(staging_dir)
@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/finances.csv") \
                 .withColumn("ins_dt", current_date())
 
-            finance_df.write()\
+            finance_df.write\
                 .partitionBy("ins_dt")\
                 .mode("append")\
                 .parquet(staging_dir)
