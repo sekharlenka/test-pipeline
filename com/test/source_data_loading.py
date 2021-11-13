@@ -6,8 +6,6 @@ import utils.utilities as ut
 
 if __name__ == '__main__':
 
-
-
     current_dir = os.path.abspath(os.path.dirname(__file__))
     app_config_path = os.path.abspath(current_dir + "/../../" + "application.yml")
     app_secrets_path = os.path.abspath(current_dir + "/../../" + ".secrets")
@@ -17,6 +15,15 @@ if __name__ == '__main__':
     secret = open(app_secrets_path)
     app_secret = yaml.load(secret, Loader=yaml.FullLoader)
 
+    # Create the SparkSession
+    spark = SparkSession \
+        .builder \
+        .appName("Read ingestion enterprise applications") \
+        .config("spark.mongodb.input.uri", app_secret["mongodb_config"]["uri"]) \
+        .master('local[*]') \
+        .getOrCreate()
+    spark.sparkContext.setLogLevel('ERROR')
+
     source_list = app_conf['source_list']
 
     for src in source_list:
@@ -24,14 +31,6 @@ if __name__ == '__main__':
         src_conf = app_conf[src]
         staging_dir = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src
         if src == 'SB':
-            # Create the SparkSession
-            spark = SparkSession \
-                .builder \
-                .appName("Read ingestion enterprise applications") \
-                .master('local[*]') \
-                .getOrCreate()
-            spark.sparkContext.setLogLevel('ERROR')
-
             txn_df = ut.read_from_mysql(app_secret, src_conf["mysql_conf"]["dbtable"], src_conf["mysql_conf"]["partition_column"], spark)
 
             txn_df = txn_df.withColumn("ins_dt", current_date())
@@ -44,15 +43,6 @@ if __name__ == '__main__':
 
         if src == 'OL':
 
-            # Create the SparkSession
-            spark = SparkSession \
-                .builder \
-                .appName("DataFrames examples") \
-                .master('local[*]') \
-                .config('spark.jars.packages', 'com.springml:spark-sftp_2.11:1.1.1') \
-                .getOrCreate()
-            spark.sparkContext.setLogLevel('ERROR')
-
             ol_txn_df = ut.read_from_sftp(app_secret, src_conf["sftp_conf"]["directory"], src_conf["sftp_conf"]["filename"], os.path.abspath(current_dir + "/../../" + app_secret["sftp_conf"]["pem"]), spark )
             ol_txn_df2 = ol_txn_df.withColumn("ins_dt", current_date())
             ol_txn_df2.show()
@@ -63,14 +53,6 @@ if __name__ == '__main__':
                 .parquet(staging_dir)
 
         if src == 'ADDR':
-            # Create the SparkSession
-            spark = SparkSession \
-                .builder \
-                .appName("Read ingestion enterprise applications") \
-                .config("spark.mongodb.input.uri", app_secret["mongodb_config"]["uri"]) \
-                .getOrCreate()
-            spark.sparkContext.setLogLevel('ERROR')
-
             students = spark\
                 .read\
                 .format("com.mongodb.spark.sql.DefaultSource")\
@@ -79,24 +61,15 @@ if __name__ == '__main__':
                 .load()\
                 .withColumn("ins_dt", current_date())
 
-
             students.write\
                 .partitionBy("ins_dt")\
                 .mode("append")\
                 .parquet(staging_dir)
             print("\nReading data from MongoDB using com.mongodb")
             students.show(5)
+
         if src == 'CP':
-
-            # Create the SparkSession
-            spark = SparkSession \
-                .builder \
-                .appName("DataFrames examples") \
-                .master('local[*]') \
-                .config('spark.jars.packages', 'org.apache.hadoop:hadoop-aws:2.7.4') \
-                .getOrCreate()
-            spark.sparkContext.setLogLevel('ERROR')
-
+            print("\nReading data from S3 Bucket using org.apache.hadoop:hadoop-aws:2.7.4")
             finance_df = spark.read \
                 .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/finances.csv") \
                 .withColumn("ins_dt", current_date())
