@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
             finance_df.write\
                 .partitionBy("ins_dt")\
-                .mode("overwrite")\
+                .mode("append")\
                 .parquet(staging_dir)
 
 # spark-submit --packages "mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/test/source_data_loading.py
