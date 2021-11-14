@@ -21,24 +21,23 @@ if __name__ == '__main__':
         .appName("Read ingestion enterprise applications") \
         .getOrCreate()
     spark.sparkContext.setLogLevel('ERROR')
+    jdbc_url = ut.get_redshift_jdbc_url(app_secret)
+    print(jdbc_url)
 
     target_list = app_conf['target_list']
     for tgt in target_list:
         tgt_conf = app_conf[tgt]
-        if tgt == 'REGIS_DIM':
+
             src_data = tgt_conf["source_data"]
             print("\nReading data from S3 Bucket using org.apache.hadoop:hadoop-aws:2.7.4")
             cp_df = spark.read \
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src_data)
 
             cp_df.createOrReplaceTempView("CP")
-
+        if tgt == 'REGIS_DIM':
             cp_reg_tgt_df =spark.sql(tgt_conf["loadingQuery"])
 
             print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
-
-            jdbc_url = ut.get_redshift_jdbc_url(app_secret)
-            print(jdbc_url)
 
             cp_reg_tgt_df.coalesce(1).write\
                 .format("io.github.spark_redshift_community.spark.redshift") \
@@ -48,6 +47,7 @@ if __name__ == '__main__':
                 .option("dbtable", "DATAMART.REGIS_DIM") \
                 .mode("overwrite")\
                 .save()
+        if tgt == 'CHILD_DIM':
 
             cp_chld_tgt_df = spark.sql(tgt_conf["loadingQuery"])
             print("Writing cp_tgt_df dataframe to AWS Redshift Table   CHILD_DIM >>>>>>>")
@@ -59,10 +59,6 @@ if __name__ == '__main__':
                 .option("dbtable", "DATAMART.CHILD_DIM") \
                 .mode("overwrite") \
                 .save()
-
-
-
-
 
 
 # spark-submit --master yarn --jars "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.36.1060/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar" --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" com/test/target_data_loading.py
