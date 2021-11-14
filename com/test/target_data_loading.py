@@ -35,6 +35,20 @@ if __name__ == '__main__':
 
             spark.sql(tgt_conf["loadingQuery"]).show()
 
+            print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
+
+            jdbc_url = ut.get_redshift_jdbc_url(app_secret)
+            print(jdbc_url)
+
+            txn_df.coalesce(1).write\
+                .format("io.github.spark_redshift_community.spark.redshift") \
+                .option("url", jdbc_url) \
+                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+                .option("forward_spark_s3_credentials", "true") \
+                .option("dbtable", "DATAMART.REGIS_DIM") \
+                .mode("overwrite")\
+                .save()
+
 
 
 
