@@ -28,12 +28,12 @@ if __name__ == '__main__':
     for tgt in target_list:
         tgt_conf = app_conf[tgt]
 
-            src_data = tgt_conf["source_data"]
-            print("\nReading data from S3 Bucket using org.apache.hadoop:hadoop-aws:2.7.4")
-            cp_df = spark.read \
+        src_data = tgt_conf["source_data"]
+        print("\nReading data from S3 Bucket using org.apache.hadoop:hadoop-aws:2.7.4")
+        cp_df = spark.read \
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src_data)
 
-            cp_df.createOrReplaceTempView("CP")
+        cp_df.createOrReplaceTempView("CP")
         if tgt == 'REGIS_DIM':
             cp_reg_tgt_df =spark.sql(tgt_conf["loadingQuery"])
 
