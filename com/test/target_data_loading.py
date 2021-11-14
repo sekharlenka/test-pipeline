@@ -32,7 +32,7 @@ if __name__ == '__main__':
         print("\nReading data from S3 Bucket using org.apache.hadoop:hadoop-aws:2.7.4")
         cp_df = spark.read \
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src_data)
-
+        cp_df.show()
         cp_df.createOrReplaceTempView("CP")
         if tgt == 'REGIS_DIM':
             cp_reg_tgt_df =spark.sql(tgt_conf["loadingQuery"])
