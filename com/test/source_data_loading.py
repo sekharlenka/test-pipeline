@@ -71,12 +71,14 @@ if __name__ == '__main__':
         if src == 'CP':
             print("\nReading data from S3 Bucket using org.apache.hadoop:hadoop-aws:2.7.4")
             finance_df = spark.read \
+                .option('delimiter', '|')\
+                .option('header', 'true')\
                 .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/finances.csv") \
                 .withColumn("ins_dt", current_date())
 
             finance_df.write\
                 .partitionBy("ins_dt")\
-                .mode("append")\
+                .mode("overwrite")\
                 .parquet(staging_dir)
 
 # spark-submit --packages "mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/test/source_data_loading.py

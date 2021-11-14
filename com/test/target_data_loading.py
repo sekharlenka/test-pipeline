@@ -19,8 +19,6 @@ if __name__ == '__main__':
     spark = SparkSession \
         .builder \
         .appName("Read ingestion enterprise applications") \
-        .config("spark.mongodb.input.uri", app_secret["mongodb_config"]["uri"]) \
-        .master('local[*]') \
         .getOrCreate()
     spark.sparkContext.setLogLevel('ERROR')
 
@@ -42,4 +40,4 @@ if __name__ == '__main__':
 
 
 
-    # spark-submit --packages "mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/test/trget_data_loading.py
+# spark-submit --master yarn --packages "org.apache.hadoop:hadoop-aws:2.7.4" com/test/target_data_loading.py
