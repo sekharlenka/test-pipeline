@@ -50,6 +50,7 @@ if __name__ == '__main__':
         if tgt == 'CHILD_DIM':
 
             cp_chld_tgt_df = spark.sql(tgt_conf["loadingQuery"])
+            cp_chld_tgt_df.show()
             print("Writing cp_tgt_df dataframe to AWS Redshift Table   CHILD_DIM >>>>>>>")
             cp_chld_tgt_df.coalesce(1).write \
                 .format("io.github.spark_redshift_community.spark.redshift") \
