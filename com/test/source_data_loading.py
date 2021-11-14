@@ -73,7 +73,7 @@ if __name__ == '__main__':
             finance_df = spark.read \
                 .option('delimiter', '|')\
                 .option('header', 'true')\
-                .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/finances.csv") \
+                .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/KC_Extract_1_20171009.csv") \
                 .withColumn("ins_dt", current_date())
 
             finance_df.write\
