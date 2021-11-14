@@ -2,7 +2,7 @@ source_list:
   - CP
 
 target_list:
-  - REGIS_DIM
+  - CHILD_DIM
 
 staging_dir: staging
 
@@ -46,6 +46,22 @@ REGIS_DIM:
       WHERE
         INS_DT = CURRENT_DATE
       ) CP
+
+
+CHILD_DIM:
+  tableName: DATAMART.CHILD_DIM
+  source_data: CP
+  loadingQuery: >
+    SELECT
+      MONOTONICALLY_INCREASING_ID() CHILD_KEY, REGIS_CNSM_ID, REGIS_CTY_CODE, CHILD_ID, CHILD_NB,
+          CHILD_GENDER, INS_DT
+              FROM
+                   (SELECT DISTINCT REGIS_CNSM_ID, REGIS_CTY_CODE, CHILD_ID, CHILD_NB, CHILD_GENDER, INS_DT
+              FROM
+                  CP
+              WHERE
+                  INS_DT = '2021-06-26' AND CHILD_ID IS NOT NULL
+              ) CP
 
 s3_conf:
   s3_bucket: raj-4321
