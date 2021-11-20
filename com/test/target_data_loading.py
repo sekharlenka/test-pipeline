@@ -84,7 +84,7 @@ if __name__ == '__main__':
             fct_tgt_df.coalesce(1).write\
                 .format("io.github.spark_redshift_community.spark.redshift") \
                 .option("url", jdbc_url) \
-                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+                .option("tempdir", "s3a://" + s3_conf["s3_bucket"] + "/temp") \
                 .option("forward_spark_s3_credentials", "true") \
                 .option("dbtable", tgt_conf["tableName"]) \
                 .mode("overwrite")\
