@@ -81,6 +81,7 @@ if __name__ == '__main__':
 
             fct_tgt_df =spark.sql(tgt_conf["loadingQuery"])
             print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
+            fct_tgt_df.show(5,False)
             fct_tgt_df.coalesce(1).write\
                 .format("io.github.spark_redshift_community.spark.redshift") \
                 .option("url", jdbc_url) \
