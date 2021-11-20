@@ -87,8 +87,8 @@ RTL_TXN_FCT:
           LEFT OUTER JOIN REGIS_DIM REG
             ON REC.LOYALTY_ID = REG.CNSM_ID
       WHERE
-          TXN.INS_DT = '2021-11-14'
-            AND (REC.INS_DT = '2021-11-20' OR REC.INS_DT is NULL)
+          TXN.INS_DT = '2021-11-13'
+            AND (REC.INS_DT = '2021-11-14' OR REC.INS_DT is NULL)
 s3_conf:
   s3_bucket: raj-4321
 
