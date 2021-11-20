@@ -2,7 +2,7 @@ source_list:
   - CP
 
 target_list:
-  - CHILD_DIM
+  - RTL_TXN_FCT
 
 staging_dir: staging
 
