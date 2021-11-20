@@ -35,6 +35,7 @@ if __name__ == '__main__':
             stg_df = spark.read \
                     .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src_data)
             stg_df.show()
+            print("\ tempView " + src_data)
             stg_df.createOrReplaceTempView(src_data)
         if tgt == 'REGIS_DIM':
             cp_reg_tgt_df =spark.sql(tgt_conf["loadingQuery"])
