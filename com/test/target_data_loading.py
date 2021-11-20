@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
             dim_df.show(5, False)
 
-            dim_df.createOrReplaceTempView(gt_conf["target_src_table"])
+            dim_df.createOrReplaceTempView(tgt_conf["target_src_table"])
 
             fct_tgt_df =spark.sql(tgt_conf["loadingQuery"])
             print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
