@@ -68,7 +68,7 @@ RTL_TXN_FCT:
   source_data:
     - SB
     - OL
-  target_src_table: REGIS_DIM
+  target_src_table: DATAMART.REGIS_DIM
   tableName: DATAMART.RTL_TXN_FCT
   loadingQuery: >
       SELECT
