@@ -34,8 +34,17 @@ def read_from_mysql(app_secret, table, partition_col, spark):
         .load()
     return txn_df
 
+def read_from_mongodb(spark, database, collection):
+    df = spark \
+        .read \
+        .format("com.mongodb.spark.sql.DefaultSource") \
+        .option("database", database) \
+        .option("collection", collection) \
+        .load()
+    return df
 
-def read_from_sftp(app_secret, directory , filename , pemfile, spark):
+
+def read_from_sftp(app_secret, directory, filename, pemfile, spark):
     print("\nReading data from sftp using com.springml.spark.sftp")
     ol_txn_df = spark.read\
                 .format("com.springml.spark.sftp")\
@@ -45,5 +54,39 @@ def read_from_sftp(app_secret, directory , filename , pemfile, spark):
                 .option("pem", pemfile)\
                 .option("fileType", "csv")\
                 .option("delimiter", "|")\
-                .load(directory  + "/" + filename)
+                .load(directory + "/" + filename)
     return ol_txn_df
+
+def read_csv_from_s3(spark, path, delimiter = '|', header = 'true'):
+    df = spark.read \
+        .option('delimiter', delimiter) \
+        .option('header', header) \
+        .csv(path)
+    return df
+
+def write_to_s3(df, staging_dir, partition_col = 'ins_dt', mode = 'overwrite'):
+    df.write \
+        .partitionBy(partition_col) \
+        .mode(mode) \
+        .parquet(staging_dir)
+
+def write_to_rs (df,path,dbtable):
+    df.coalesce(1).write\
+        .format("io.github.spark_redshift_community.spark.redshift") \
+        .option("url", jdbc_url) \
+        .option("tempdir", path) \
+        .option("forward_spark_s3_credentials", "true") \
+        .option("dbtable", dbtable) \
+        .mode("overwrite")\
+        .save()
+
+def read_from_rs (path,target_table):
+    df = spark.read \
+        .format("io.github.spark_redshift_community.spark.redshift") \
+        .option("url", jdbc_url) \
+        .option("dbtable", target_table) \
+        .option("forward_spark_s3_credentials", "true") \
+        .option("tempdir", path) \
+        .load()
+    return df
+

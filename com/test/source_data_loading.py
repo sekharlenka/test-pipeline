@@ -20,7 +20,6 @@ if __name__ == '__main__':
         .builder \
         .appName("Read ingestion enterprise applications") \
         .config("spark.mongodb.input.uri", app_secret["mongodb_config"]["uri"]) \
-        .master('local[*]') \
         .getOrCreate()
     spark.sparkContext.setLogLevel('ERROR')
 
@@ -32,53 +31,33 @@ if __name__ == '__main__':
         staging_dir = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["staging_dir"] + "/" + src
         if src == 'SB':
             txn_df = ut.read_from_mysql(app_secret, src_conf["mysql_conf"]["dbtable"], src_conf["mysql_conf"]["partition_column"], spark)
-
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show()
 
-            txn_df.write \
-                .partitionBy("ins_dt") \
-                .mode("append") \
-                .parquet(staging_dir)
+            # write a function to write a df to s3
+            ut.write_to_s3(txn_df, staging_dir)
 
         if src == 'OL':
-
             ol_txn_df = ut.read_from_sftp(app_secret, src_conf["sftp_conf"]["directory"], src_conf["sftp_conf"]["filename"], os.path.abspath(current_dir + "/../../" + app_secret["sftp_conf"]["pem"]), spark )
             ol_txn_df2 = ol_txn_df.withColumn("ins_dt", current_date())
             ol_txn_df2.show()
 
-            ol_txn_df2.write\
-                .partitionBy("ins_dt")\
-                .mode("append")\
-                .parquet(staging_dir)
+            # write a function to write a df to s3
+            ut.write_to_s3(ol_txn_df2, staging_dir)
 
         if src == 'ADDR':
-            students = spark\
-                .read\
-                .format("com.mongodb.spark.sql.DefaultSource")\
-                .option("database", src_conf["mongodb_config"]["database"])\
-                .option("collection", src_conf["mongodb_config"]["collection"])\
-                .load()\
+            # write a function to read from mongo db
+            addr_df = ut.read_from_mongodb(spark, src_conf["mongodb_config"]["database"], src_conf["mongodb_config"]["collection"]) \
                 .withColumn("ins_dt", current_date())
-
-            students.write\
-                .partitionBy("ins_dt")\
-                .mode("append")\
-                .parquet(staging_dir)
-            print("\nReading data from MongoDB using com.mongodb")
-            students.show(5)
+            addr_df.show(5)
+            ut.write_to_s3(addr_df, staging_dir)
 
         if src == 'CP':
             print("\nReading data from S3 Bucket using org.apache.hadoop:hadoop-aws:2.7.4")
-            finance_df = spark.read \
-                .option('delimiter', '|')\
-                .option('header', 'true')\
-                .csv("s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/KC_Extract_1_20171009.csv") \
+            # write a function to read from s3
+            cp_df = ut.read_csv_from_s3(spark, "s3a://" + src_conf["s3_conf"]["s3_bucket"] + "/" + src_conf["s3_conf"]["filename"])\
                 .withColumn("ins_dt", current_date())
 
-            finance_df.write\
-                .partitionBy("ins_dt")\
-                .mode("overwrite")\
-                .parquet(staging_dir)
+            ut.write_to_s3(cp_df, staging_dir)
 
-# spark-submit --packages "mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/test/source_data_loading.py
+# spark-submit --master yarn --packages "mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/test/source_data_loading.py
