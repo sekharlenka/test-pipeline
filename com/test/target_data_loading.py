@@ -44,7 +44,7 @@ if __name__ == '__main__':
             print("Writing CHILD_DIM  to AWS Redshift >>>>>>>")
             child_dim_df = spark.sql(tgt_conf["loadingQuery"])
             child_dim_df.show()
-            ut.write_to_rs(child_dim_df, "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp", "DATAMART.CHILD_DIM")
+            ut.write_to_rs(child_dim_df, "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp", "DATAMART.CHILD_DIM" ,jdbc_url)
 
         if tgt == 'RTL_TXN_FCT':
 
@@ -55,6 +55,6 @@ if __name__ == '__main__':
             fct_tgt_df =spark.sql(tgt_conf["loadingQuery"])
             print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
             fct_tgt_df.show(5,False)
-            ut.write_to_rs(fct_tgt_df, "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp", tgt_conf["tableName"])
+            ut.write_to_rs(fct_tgt_df, "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp", tgt_conf["tableName"] , jdbc_url)
 
 # spark-submit --master yarn --jars "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.36.1060/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar" --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" com/test/target_data_loading.py
