@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
         if tgt == 'RTL_TXN_FCT':
 
-            ut.read_from_rs("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp" , tgt_conf["target_src_table"])
+            ut.read_from_rs(spark,"s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp" , tgt_conf["target_src_table"])
             dim_df.show(5, False)
 
             dim_df.createOrReplaceTempView(tgt_conf["target_src_table_nm"])

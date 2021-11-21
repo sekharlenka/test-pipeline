@@ -80,7 +80,7 @@ def write_to_rs (df,path,dbtable):
         .mode("overwrite")\
         .save()
 
-def read_from_rs (path,target_table):
+def read_from_rs (spark,path,target_table):
     df = spark.read \
         .format("io.github.spark_redshift_community.spark.redshift") \
         .option("url", jdbc_url) \
