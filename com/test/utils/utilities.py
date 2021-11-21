@@ -70,7 +70,7 @@ def write_to_s3(df, staging_dir, partition_col = 'ins_dt', mode = 'overwrite'):
         .mode(mode) \
         .parquet(staging_dir)
 
-def write_to_rs (df,path,dbtable):
+def write_to_rs (df, path, dbtable, jdbc_url):
     df.coalesce(1).write\
         .format("io.github.spark_redshift_community.spark.redshift") \
         .option("url", jdbc_url) \
@@ -80,7 +80,7 @@ def write_to_rs (df,path,dbtable):
         .mode("overwrite")\
         .save()
 
-def read_from_rs (spark,path,target_table):
+def read_from_rs (spark,path,target_table, jdbc_url):
     df = spark.read \
         .format("io.github.spark_redshift_community.spark.redshift") \
         .option("url", jdbc_url) \

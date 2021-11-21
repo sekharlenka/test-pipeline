@@ -21,9 +21,8 @@ if __name__ == '__main__':
         .appName("Read ingestion enterprise applications") \
         .getOrCreate()
     spark.sparkContext.setLogLevel('ERROR')
-    jdbc_url = ut.get_redshift_jdbc_url(app_secret)
-    print(jdbc_url)
 
+    jdbc_url = ut.get_redshift_jdbc_url(app_secret)
     target_list = app_conf['target_list']
     for tgt in target_list:
         tgt_conf = app_conf[tgt]
@@ -39,7 +38,7 @@ if __name__ == '__main__':
             print("Writing REGIS_DIM  to AWS Redshift >>>>>>>")
             regis_dim_df = spark.sql(tgt_conf["loadingQuery"])
             regis_dim_df.show()
-            ut.write_to_rs(regis_dim_df, "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp", "DATAMART.REGIS_DIM")
+            ut.write_to_rs(regis_dim_df, "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp", "DATAMART.REGIS_DIM", jdbc_url)
 
         if tgt == 'CHILD_DIM':
             print("Writing CHILD_DIM  to AWS Redshift >>>>>>>")
@@ -49,7 +48,7 @@ if __name__ == '__main__':
 
         if tgt == 'RTL_TXN_FCT':
 
-            ut.read_from_rs(spark,"s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp" , tgt_conf["target_src_table"])
+            ut.read_from_rs(spark,"s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp" , tgt_conf["target_src_table"], jdbc_url)
             dim_df.show(5, False)
 
             dim_df.createOrReplaceTempView(tgt_conf["target_src_table_nm"])
